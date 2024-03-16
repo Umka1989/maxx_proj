@@ -1,0 +1,45 @@
+h4 {
+    border: 3px solid yellow;
+}
+
+.AngleStyleRight {
+    width: 12px;
+    height: 100vh;
+    rotate: 180deg;
+    background-color: #2a3f5f;
+    float: left;
+    margin-left: 5px;
+    position:fixed;
+}
+
+.AngleStyleLeft {
+    width: 2%;
+    height: 100vh;
+    background-color: #2a3f5f;
+    float: left;
+    position:fixed;
+}
+
+.leftStyleOpened {
+    float: left;
+    width: 49%;
+}
+.rightStyleOpened {
+    float: right;
+    width: 49%;
+    border: 1px solid black;
+}
+.leftStyleClosed {
+    float: left;
+    width: 98%;
+}
+.rightStyleClosed {
+    display: none;
+}
+
+.clearStyle {
+    clear: both;
+}
+
+
+

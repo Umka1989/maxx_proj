@@ -1,0 +1,24 @@
+.tableStyle {
+    border: 1px solid gray;
+    border-collapse: collapse;
+}
+.tdStyle {
+    border: 1px solid gray;
+}
+.thStyle {
+    border: 1px solid gray;
+    position: sticky;
+    background-color: #119dff;
+    top: 0;
+}
+
+
+.theadStyle{
+    position: sticky;
+    top: 0;
+}
+
+.tbodyStyle{
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
