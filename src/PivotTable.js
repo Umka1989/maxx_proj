@@ -1,6 +1,7 @@
 import styles from './table.module.css';
 
 function PivotTable(props) {
+    // набор пользовательских параметров для построения сводной
   let user_set = {
     'dimensions': {
       'columns': [],
@@ -18,6 +19,7 @@ function PivotTable(props) {
     }
   });
   function contains(arr, elem) {
+      //Находит индекс объекта в массиве
     for (let i = 0; i < arr.length; i++) {
         if (JSON.stringify(arr[i][0]) === JSON.stringify(elem)) {
             return i;
@@ -27,6 +29,7 @@ function PivotTable(props) {
   };
 
   function sum_values(arr) {
+      // суммирует все элементы массива
     let value = 0
     for (var i = 0; i < arr.length; i++) {
         value += arr[i]
@@ -35,38 +38,51 @@ function PivotTable(props) {
 };
   let rows = [];
   let cols = [];
-  props.data.forEach((number, source_data_index) => {
+  props.data.forEach((dataObject, sourceDataIndex) => {
            //rows
            let value_indexes = [];
-           value_indexes.push(source_data_index);
-           let source_data_row = [];
-           user_set['dimensions']['rows'].forEach((number, user_set_row_index) => {
-                source_data_row.push(props.data[source_data_index][user_set['dimensions']['rows'][user_set_row_index]]);
+           value_indexes.push(sourceDataIndex);
+           //список значений, соответствующих выбранным строкам в одном эелементе массива исходных данных
+           let sourceDataRow = [];
+           user_set['dimensions']['rows'].forEach((rowsName) => {
+                sourceDataRow.push(dataObject[rowsName]);
            });
-           let source_data_row_n_value_indexes = [];
-           source_data_row_n_value_indexes.push(source_data_row, value_indexes);
-           if (contains(rows, source_data_row) > -1) {rows[(contains(rows, source_data_row))][1].push(source_data_index)}
-           else {rows.push(source_data_row_n_value_indexes);}
+           // Массив выбранных пользователем rows(массив) и строк, в которых эти занчения нашлись (массив)
+           let rowsVSdataIndexes = [];
+           rowsVSdataIndexes.push(sourceDataRow, value_indexes);
+           let existingRowsItem = contains(rows, sourceDataRow);
+           if (existingRowsItem > -1) {
+               rows[existingRowsItem][1].push(sourceDataIndex)
+           } else {
+               rows.push(rowsVSdataIndexes)
+           }
 
            //cols
            value_indexes = [];
-           value_indexes.push(source_data_index);
-
-           let source_data_col = [];
-           user_set['dimensions']['columns'].forEach((number, user_set_col_index) => {
-                source_data_col.push(props.data[source_data_index][user_set['dimensions']['columns'][user_set_col_index]]);
+           value_indexes.push(sourceDataIndex);
+           //список значений, соответствующих выбранным столбцам в одном эелементе массива исходных данных
+           let sourceDataCol = [];
+           user_set['dimensions']['columns'].forEach((colsName, user_set_col_index) => {
+                sourceDataCol.push(dataObject[colsName]);
            });
-
-           let source_data_col_n_value_indexes = [];
-           source_data_col_n_value_indexes.push(source_data_col, value_indexes);
-
-           if (contains(cols, source_data_col) > -1) {cols[(contains(cols, source_data_col))][1].push(source_data_index)}
-           else {cols.push(source_data_col_n_value_indexes);}
+            // Массив выбранных пользователем cols(массив) и строк, в которых эти занчения нашлись (массив)
+           let colsVSdataIndexes = [];
+           colsVSdataIndexes.push(sourceDataCol, value_indexes);
+            let existingColsItem = contains(cols, sourceDataCol);
+           if (existingColsItem > -1) {
+               cols[existingColsItem][1].push(sourceDataIndex);
+           } else {
+               cols.push(colsVSdataIndexes);
+           }
 
 });
 
-cols.sort();
-rows.sort();
+//cols.sort();
+//rows.sort();
+console.log('строки')
+console.log(rows)
+console.log('столбцы')
+console.log(cols)
 let result = [];
 
 rows.forEach((n, ri) => {
@@ -94,8 +110,10 @@ rows.forEach((n, ri) => {
 
 var headers = [];
 var header_row = [];
-
+console.log('result');
+console.log(result);
 //cols_headers
+
 user_set['dimensions']['columns'].forEach((n, uci) => {
     header_row = [];
     user_set['dimensions']['rows'].forEach((n, uri) => {
@@ -110,23 +128,25 @@ user_set['dimensions']['columns'].forEach((n, uci) => {
             }
     });
     headers.push(header_row);
-    header_row = [];
-});
 
+});
+console.log('headers');
+console.log(headers);
 //measure_headers
 header_row = [];
 user_set['dimensions']['rows'].forEach((n, uri) => {
     header_row.push(user_set['dimensions']['rows'][uri]);
 });
-header_row.push('Measure');
+//header_row.push('Measure');
+let measureHeader = [];
 result[0].forEach((n, ri) => {
     if (ri != 0) {
         user_set['measures'].forEach((n, umi) => {
-        header_row.push(user_set['measures'][umi]);
+        measureHeader.push(user_set['measures'][umi]);
         });
         }
 });
-headers.push(header_row);
+console.log(measureHeader);
 
 // values
 
@@ -156,8 +176,8 @@ result.forEach((n, ri) => {
     let tbody = [];
 
 
-	function buildHeaders(data){
-
+	function buildHeaders(data, measureData){
+        let firstElem;
 		for (let i = 0; i < data.length; i++){
 			let row = [];
 			let rowData = [];
@@ -168,13 +188,35 @@ result.forEach((n, ri) => {
             }
 			let counts = {};
             rowData.forEach(function (x) { counts[x] = (counts[x] || 0) + 1; });
+            firstElem = counts[''];
+            console.log('firstElem');
+            console.log(firstElem);
             for (const [key, value] of Object.entries(counts)) {
                 row.push(<th colSpan={value} className={styles.thStyle}>{key}</th>)
             }
+            console.log('counts');
+            console.log(counts);
 			thead.push(<tr>{row}</tr>);
 		}
+		let measureRow = [];
+		if (typeof myVar !== 'undefined'){
+		    measureRow.push(<th className={styles.thStyle} colSpan={firstElem}></th>)
+		}
+		measureRow.push(<th className={styles.thStyle}></th>)
+        measureData.forEach((each)=>{
+            measureRow.push(<th className={styles.thStyle}>{each}</th>);
+        })
+        thead.push(<tr>{measureRow}</tr>);
 	}
+
+
+
+
+console.log('values');
+console.log(values);
+
 	function buildData(data){
+
 		for (let i = 0; i < data.length; i++){
 			let row = [];
 			for (let x = 0; x < data[i].length; x++){
@@ -184,7 +226,8 @@ result.forEach((n, ri) => {
 			tbody.push(<tr>{row}</tr>);
 		}
 	}
-	buildHeaders(headers);
+	buildHeaders(headers, measureHeader);
+
     buildData(values);
 
   return (
